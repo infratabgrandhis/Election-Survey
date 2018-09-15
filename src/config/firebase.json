@@ -1,0 +1,19 @@
+{
+    "initializeConfig": {
+        "apiKey": "AIzaSyDeBTHPiSFFzACjcV1_z7Feg4KabAmCTIg",
+        "authDomain": "survey-e4c99.firebaseapp.com",
+        "databaseURL": "https://survey-e4c99.firebaseio.com",
+        "projectId": "survey-e4c99",
+        "storageBucket": "survey-e4c99.appspot.com",
+        "messagingSenderId": "1009853134874"
+    },
+    "urls": {
+        "submitSurvey": "https://survey-e4c99.firebaseio.com/{uid}.json",
+        "questionURL": "https://survey-e4c99.firebaseio.com/{question}.json",
+        "getConstituenciesList": "https://survey-e4c99.firebaseio.com/constituencyList.json",
+        "getMandalAndVillageList": "https://survey-e4c99.firebaseio.com/{constituency}.json",
+        "users": "https://survey-e4c99.firebaseio.com/users.json",
+        "occupationList": "https://survey-e4c99.firebaseio.com/occupation.json",
+        "questionMeta": "https://survey-e4c99.firebaseio.com/QuestionnaireMeta.json"
+    }
+}
