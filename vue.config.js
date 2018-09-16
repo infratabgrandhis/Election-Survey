@@ -1,3 +1,7 @@
 module.exports = {
-    baseUrl: '/electionsurvey'
+    baseUrl: '/electionsurvey',
+    pwa: {
+        name: "Survey",
+        themeColor: '#ffffff',
+    }
 }
