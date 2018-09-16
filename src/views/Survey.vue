@@ -82,7 +82,7 @@
                                 :key="n">
                     </v-checkbox>
                     <v-textarea :placeholder="currentQuestion.placeholder"
-                                :value="currentQuestionAns"
+                                v-model="currentQuestionAns"
                                 v-if="currentQuestion.type"
                                 rows="1"
                                 auto-grow
@@ -159,13 +159,18 @@ export default {
             const url = config.urls.questionURL.replace('{question}', questionId);
             this.currentQuestionId = questionId;
             if(this.name && this.phone && this.genderVal && this.age && this.voterCategoryVal && this.occupationVal) {
-                axios.get(url).then((result) => {
-                    this.currentQuestion = _values(result.data)[0] || {};
-                    this.isQuestionCardActive = true;
-                    this.currentQuestionAns= (this.currentQuestion.multipleSelection) ? [] : '';
-                }).catch((err) => {
-                    this.errorCallback(err);
-                })
+                if(this.phone.length === 10 ) {
+                    axios.get(url).then((result) => {
+                        this.currentQuestion = _values(result.data)[0] || {};
+                        this.isQuestionCardActive = true;
+                        this.currentQuestionAns= (this.currentQuestion.multipleSelection) ? [] : '';
+                    }).catch((err) => {
+                        this.errorCallback(err);
+                    })
+                } else {
+                    this.errorCallback({"message":"phone number not in valid format"})
+                }
+                
             } else {
                 this.errorCallback({"message":'All the above fields are mandatory to fill..'});
             }
@@ -203,14 +208,19 @@ export default {
                 constituency: state.authUser.constituency,
                 mandal: state.mandalName,
                 village:state.villageName,
-                date:new Date().toGMTString()
+                date:new Date().toGMTString(),
+                feedback:this.currentQuestionAns
             };
-            axios.post(url, payload).then((result) => {
+            if (payload.feedback) {
+                axios.post(url, payload).then((result) => {
                     this.errorCallback({"message":'Successfully submitted survey', color: 'success'});
                     router.push('/');
                 }).catch((err) => {
                     this.errorCallback(err);
                 })
+            } else {
+                this.errorCallback({"message":"Enter feedback and complaints in above field."});
+            }
         }
     },
     created() {
