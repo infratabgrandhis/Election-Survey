@@ -27,6 +27,7 @@
                               v-model="constituency"
                               label="constituencies"></v-select>
                     <v-switch :label="`Admin: ${admin.toString().toUpperCase()}`"
+                                class="full-width"
                               v-model="admin"></v-switch>
                     <v-btn color="success"
                            @click="addUser">Add</v-btn>

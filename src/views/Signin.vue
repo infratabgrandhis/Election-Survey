@@ -12,6 +12,7 @@
                                   :clearable="true"></v-text-field>
                     <v-text-field label="Password"
                                   type="password"
+                                  class="full-width"
                                   v-model="password"
                                   hint="At least 8 characters"
                                   :rules="[rules.required, rules.min]"
