@@ -8,6 +8,7 @@
         "messagingSenderId": "1009853134874"
     },
     "urls": {
+        "ageList": "https://survey-e4c99.firebaseio.com/agesList.json",
         "submitSurvey": "https://survey-e4c99.firebaseio.com/{uid}.json",
         "questionURL": "https://survey-e4c99.firebaseio.com/{question}.json",
         "getConstituenciesList": "https://survey-e4c99.firebaseio.com/constituencyList.json",

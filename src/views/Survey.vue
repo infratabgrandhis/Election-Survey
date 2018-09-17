@@ -24,14 +24,10 @@
                                  :label="`${n}`"
                                  :value="n"></v-radio>
                     </v-radio-group>
-                    <v-slider v-model="age"
-                              :max="100"
-                              :min="18"
-                              :step="1"
-                              label="Age"></v-slider>
-                    <v-flex shrink
-                            style="width: 43px;padding-top: 21px">
-                        <label class="v-label theme--light">{{age}}</label>
+                    <v-flex>
+                        <v-select :items="ageList"
+                                  v-model="age"
+                                  label="Age"></v-select>
                     </v-flex>
                     <v-flex>
                         <v-select :items="occupationList"
@@ -119,7 +115,8 @@ export default {
             genderVal:'',
             voterCategoryList: ['New_voter', "Existing_voter"],
             voterCategoryVal:'',
-            age:18,
+            ageList:[],
+            age:'',
             occupationList:[],
             occupationVal:'',
             questionMeta:{},
@@ -134,6 +131,13 @@ export default {
         getOccupationList() {
             axios.get(config.urls.occupationList).then((result) => {
                 this.occupationList = _values(result.data)[0].data || [];
+            }).catch((err) => {
+                this.errorCallback(err);
+            })
+        },
+        getAgeList() {
+            axios.get(config.urls.ageList).then((result) => {
+                this.ageList = _values(result.data)[0].data || [];
             }).catch((err) => {
                 this.errorCallback(err);
             })
@@ -158,8 +162,8 @@ export default {
             const questionId = id || this.questionMeta.default;
             const url = config.urls.questionURL.replace('{question}', questionId);
             this.currentQuestionId = questionId;
-            if(this.name && this.phone && this.genderVal && this.age && this.voterCategoryVal && this.occupationVal) {
-                if(this.phone.length === 10 ) {
+            if(this.name && this.genderVal && this.age && this.voterCategoryVal && this.occupationVal) {
+                if((this.phone && this.phone.length === 10) || !this.phone ) {
                     axios.get(url).then((result) => {
                         this.currentQuestion = _values(result.data)[0] || {};
                         this.isQuestionCardActive = true;
@@ -176,7 +180,7 @@ export default {
             }
         },
         getNextQuestion() {
-            if(this.currentQuestionAns){
+            if(this.currentQuestionAns.length > 0){
                 let nextQuestionId = '';
                 if(this.currentQuestion.willDynamicQuestionCome) {
                     const index = this.currentQuestion.options.indexOf(this.currentQuestionAns);
@@ -229,6 +233,7 @@ export default {
             if(state.mandalName && state.villageName) {
                 this.getOccupationList();
                 this.getQuestionMetaData();
+                this.getAgeList();
             } else {
                 this.errorCallback({"message":"First select Mandal and village before survey"});
                 router.push('/');    
