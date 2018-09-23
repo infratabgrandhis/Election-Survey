@@ -90,9 +90,12 @@
                     <v-btn color="#1867c0"
                            v-if="!currentQuestion.isQuestionsOver"
                            @click="getNextQuestion"
+                           dark>Back
+                    </v-btn>
+                    <v-btn color="#1867c0"
+                           v-if="!currentQuestion.isQuestionsOver"
+                           @click="getNextQuestion"
                            dark>Next
-                        <v-icon dark
-                                right>keyboard_arrow_right</v-icon>
                     </v-btn>
                 </v-layout>
             </v-container>
@@ -215,6 +218,9 @@ export default {
                 date:new Date().toGMTString(),
                 feedback:this.currentQuestionAns
             };
+            if(payload.mandal === config.aliasNames.mandalAliasName) {
+                payload.mandalAlias = state.mandalAliasName;
+            }
             if (payload.feedback) {
                 axios.post(url, payload).then((result) => {
                     this.errorCallback({"message":'Successfully submitted survey', color: 'success'});
@@ -231,12 +237,23 @@ export default {
         const state = this.$store.state;
         if(state.authUser.email) {
             if(state.mandalName && state.villageName) {
-                this.getOccupationList();
-                this.getQuestionMetaData();
-                this.getAgeList();
+                if(state.mandalName === config.aliasNames.mandalAliasName) {
+                    if(state.mandalAliasName) {
+                        this.getOccupationList();
+                        this.getQuestionMetaData();
+                        this.getAgeList();
+                    } else {
+                        this.errorCallback({"message":"You should enter mandal name manually, when mandal name is OTHER."});
+                        router.push('/');
+                    }
+                } else {
+                    this.getOccupationList();
+                    this.getQuestionMetaData();
+                    this.getAgeList();
+                }
             } else {
                 this.errorCallback({"message":"First select Mandal and village before survey"});
-                router.push('/');    
+                router.push('/'); 
             }
         } else {
             router.push('/signin');

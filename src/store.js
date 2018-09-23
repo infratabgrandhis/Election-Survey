@@ -13,6 +13,7 @@ export default new Vuex.Store({
     isBurgerbarOpen: false,
     authUser: {},
     mandalName: '',
+    mandalAliasName:'',
     villageName: '',
     snackObj: {}
   },
@@ -25,6 +26,9 @@ export default new Vuex.Store({
     },
     getMandalName: state => {
       return state.mandalName;
+    },
+    getMandalAliasName: state => {
+      return state.mandalAliasName;
     },
     getVillageName: state => {
       return state.villageName;
@@ -50,6 +54,9 @@ export default new Vuex.Store({
     },
     setMandalName(state, payload) {
       Vue.set(state, 'mandalName', payload);
+    },
+    setMandalAliasName(state, payload) {
+      Vue.set(state, 'mandalAliasName', payload);
     },
     setVillageName(state, payload) {
       Vue.set(state, 'villageName', payload);
@@ -79,6 +86,9 @@ export default new Vuex.Store({
     },
     updateMandalName(context, payload) {
       context.commit('setMandalName', payload);
+    },
+    updateMandalAliasName(context, payload) {
+      context.commit('setMandalAliasName', payload);
     },
     updateVillageName(context, payload) {
       context.commit('setVillageName', payload);

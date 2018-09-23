@@ -33,6 +33,12 @@
                     <v-select :items="mandalList"
                               v-model=mandalName
                               label="Mandal"></v-select>
+                    <v-text-field label="Mandal"
+                        type="text"
+                        class="full-width"
+                        v-if="mandalName === config.aliasNames.mandalAliasName"
+                        v-model="mandalAlliasName"
+                        :clearable="true"></v-text-field>
                 </v-flex>
             </v-layout>
             <v-layout row
@@ -43,8 +49,15 @@
                 </v-flex>
                 <v-flex xs8>
                     <v-select :items="villageList"
-                              v-model=villageName
-                              label="village"></v-select>
+                        v-model=villageName
+                        v-if="mandalName !== config.aliasNames.mandalAliasName"
+                        label="village"></v-select>
+                    <v-text-field label="Village"
+                        type="text"
+                        class="full-width"
+                        v-else
+                        v-model="villageName"
+                        :clearable="true"></v-text-field>
                 </v-flex>
             </v-layout>
             <v-layout>
@@ -70,7 +83,9 @@ export default {
             villageList: [],
             constituencyData: {},
             mandalName:'',
-            villageName:''
+            mandalAlliasName:'',
+            villageName:'',
+            config,
         }
     },
     methods:{
@@ -86,16 +101,19 @@ export default {
         },
         getMandalList() {
             this.mandalList = _keys(this.constituencyData);
+            this.mandalList.push(config.aliasNames.mandalAliasName);
             this.mandalName = this.getMandalName;
+            this.mandalAlliasName = this.getMandalAliasName;
         },
         setManDalAndVillageName() {
             this.$store.dispatch('updateMandalName', this.mandalName);
+            this.$store.dispatch('updateMandalAliasName', this.mandalAlliasName);
             this.$store.dispatch('updateVillageName', this.villageName);
             router.push('/survey');
         }
     },
     computed: {
-        ...mapGetters(['getAuthData', 'getMandalName', 'getVillageName']),
+        ...mapGetters(['getAuthData', 'getMandalName', 'getVillageName','getMandalAliasName']),
     },
     created() {
         const authData = this.getAuthData;
@@ -107,6 +125,7 @@ export default {
         mandalName(newValue, oldValue) {
           this.villageList = this.constituencyData[newValue];
           this.villageName = this.getVillageName;
+          this.$store.dispatch('updateMandalAliasName', '');
         }
     },
 }

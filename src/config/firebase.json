@@ -16,5 +16,8 @@
         "users": "https://survey-e4c99.firebaseio.com/users.json",
         "occupationList": "https://survey-e4c99.firebaseio.com/occupation.json",
         "questionMeta": "https://survey-e4c99.firebaseio.com/QuestionnaireMeta.json"
+    },
+    "aliasNames":{
+        "mandalAliasName":"OTHER"
     }
 }
