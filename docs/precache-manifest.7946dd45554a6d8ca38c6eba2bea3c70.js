@@ -8,11 +8,11 @@ self.__precacheManifest = [
     "url": "/electionsurvey/js/chunk-vendors.ba6fefdc.js"
   },
   {
-    "revision": "ddc1042f486915d558d9",
-    "url": "/electionsurvey/js/app.a6dbf6ea.js"
+    "revision": "82cf65e615ce95bb4599",
+    "url": "/electionsurvey/js/app.67d5d956.js"
   },
   {
-    "revision": "6cf7dd5a0c4631de1b547a4179e5ec50",
+    "revision": "17261a1e86e208bb0e2a710a79a4b726",
     "url": "/electionsurvey/index.html"
   },
   {
@@ -20,7 +20,7 @@ self.__precacheManifest = [
     "url": "/electionsurvey/css/chunk-vendors.0c3e5376.css"
   },
   {
-    "revision": "ddc1042f486915d558d9",
+    "revision": "82cf65e615ce95bb4599",
     "url": "/electionsurvey/css/app.b55bd235.css"
   }
 ];

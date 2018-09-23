@@ -46,8 +46,6 @@
                     <v-btn color="#1867c0"
                            @click="getQuestionData"
                            dark>Next
-                        <v-icon dark
-                                right>keyboard_arrow_right</v-icon>
                     </v-btn>
                 </v-layout>
             </v-container>
@@ -88,8 +86,8 @@
                            @click="submitSurvey"
                            v-if="currentQuestion.isQuestionsOver">Submit</v-btn>
                     <v-btn color="#1867c0"
-                           v-if="!currentQuestion.isQuestionsOver"
-                           @click="getNextQuestion"
+                           v-if="currentQuestionIndex !== 0 "
+                           @click="getPreviousQuestion"
                            dark>Back
                     </v-btn>
                     <v-btn color="#1867c0"
@@ -127,6 +125,7 @@ export default {
             isQuestionCardActive:false,
             currentQuestionAns:'',
             currentQuestionId:'',
+            currentQuestionIndex:0,
             questionsWithAnswers:[]
         }
     },
@@ -161,6 +160,11 @@ export default {
                 })
             }
         },
+        setCurrentQuestionAnswer(newValue) {
+            let defaultData = (this.currentQuestion.multipleSelection) ? [] : '';
+            let previousque = this.questionsWithAnswers[this.currentQuestionIndex];
+            this.currentQuestionAns = (previousque)?previousque.answer : defaultData;
+        },
         getQuestionData(event, id){
             const questionId = id || this.questionMeta.default;
             const url = config.urls.questionURL.replace('{question}', questionId);
@@ -170,7 +174,7 @@ export default {
                     axios.get(url).then((result) => {
                         this.currentQuestion = _values(result.data)[0] || {};
                         this.isQuestionCardActive = true;
-                        this.currentQuestionAns= (this.currentQuestion.multipleSelection) ? [] : '';
+                        this.setCurrentQuestionAnswer();
                     }).catch((err) => {
                         this.errorCallback(err);
                     })
@@ -182,6 +186,11 @@ export default {
                 this.errorCallback({"message":'All the above fields are mandatory to fill..'});
             }
         },
+        getPreviousQuestion() {
+            this.currentQuestionIndex = this.currentQuestionIndex-1;
+            let previousque = this.questionsWithAnswers[this.currentQuestionIndex];
+            this.getQuestionData({}, previousque.questionId);
+        },
         getNextQuestion() {
             if(this.currentQuestionAns.length > 0){
                 let nextQuestionId = '';
@@ -191,11 +200,12 @@ export default {
                 } else {
                     nextQuestionId = this.questionMeta[this.currentQuestionId];
                 }
-                this.questionsWithAnswers.push({
+                this.questionsWithAnswers[this.currentQuestionIndex] = {
                     question:this.currentQuestion.question,
                     answer: this.currentQuestionAns,
                     questionId: this.currentQuestionId
-                });
+                };
+                this.currentQuestionIndex = this.currentQuestionIndex+1;
                 this.getQuestionData({}, nextQuestionId);
             } else {
                 this.errorCallback({"message":'Choose any value before go to next question.'})
@@ -258,7 +268,7 @@ export default {
         } else {
             router.push('/signin');
         }
-    }
+    },
 }
 </script>
 
