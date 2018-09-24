@@ -5,6 +5,7 @@ import Signin from './views/Signin.vue'
 import Signout from './views/Signout.vue'
 import Adduser from './views/Adduser.vue'
 import Survey from './views/Survey.vue'
+import Analytics from './views/Analytics.vue'
 
 Vue.use(Router)
 
@@ -29,5 +30,9 @@ export default new Router({
     path: '/survey',
     name: 'Survey',
     component: Survey
+  }, {
+    path: '/analytics',
+    name: 'Analytics',
+    component: Analytics
   }]
 })

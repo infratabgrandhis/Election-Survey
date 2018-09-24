@@ -32,6 +32,15 @@
                     <v-list-tile-title>Add User</v-list-tile-title>
                 </v-list-tile-content>
             </v-list-tile>
+            <v-list-tile @click.native="toggleBurgerBarAndRouteChange('/analytics')"
+                         v-if="getAuthData && getAuthData.admin">
+                <v-list-tile-action>
+                    <v-icon>pie_chart</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                    <v-list-tile-title>Analytics</v-list-tile-title>
+                </v-list-tile-content>
+            </v-list-tile>
             <v-list-tile @click.native="toggleBurgerBarAndRouteChange('/signin')"
                          v-if="getAuthData && !getAuthData.email">
                 <v-list-tile-action>

@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.5.0/workbox-sw.js");
 
 importScripts(
-  "/electionsurvey/precache-manifest.939a67cb8caaff422127aedf66017b0f.js"
+  "/electionsurvey/precache-manifest.d2db5672608bdf970ffde7ec415d85bd.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "elctionsurvey"});
