@@ -14,7 +14,7 @@
                             wrap
                             align-center>
                         <p v-if="!constituency">Before see Analytics, Select constituency from the dropdown</p>
-                        <DummyChart v-else></DummyChart>
+                        <DummyChart :constituencyName="constituency" v-else></DummyChart>
                         </v-layout>
                     </v-card>
                 </v-layout>
