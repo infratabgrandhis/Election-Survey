@@ -36,7 +36,7 @@
                     <v-text-field label="Mandal"
                         type="text"
                         class="full-width"
-                        v-if="mandalName === config.aliasNames.mandalAliasName"
+                        v-if="mandalName === aliasName"
                         v-model="mandalAlliasName"
                         :clearable="true"></v-text-field>
                 </v-flex>
@@ -50,13 +50,13 @@
                 <v-flex xs8>
                     <v-select :items="villageList"
                         v-model=villageName
-                        v-if="mandalName !== config.aliasNames.mandalAliasName"
+                        v-if="mandalName !== aliasName"
                         label="village"></v-select>
                     <v-text-field label="Village"
                         type="text"
                         class="full-width"
-                        v-else
-                        v-model="villageName"
+                        v-if="mandalName === aliasName || villageName === aliasName"
+                        v-model="villageAlliasName"
                         :clearable="true"></v-text-field>
                 </v-flex>
             </v-layout>
@@ -69,66 +69,86 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations } from 'vuex'
-import config from '../config/firebase.json'
-import axios from 'axios'
-import _values from 'lodash/values'
-import _keys from 'lodash/keys'
-import router from '../router.js'
+import { mapGetters, mapActions, mapMutations } from "vuex";
+import config from "@/config/firebase.json";
+import _values from "lodash/values";
+import _keys from "lodash/keys";
+import router from "@/router.js";
+import { db } from "@/fire.js";
+import util from "@/util/util.js";
 
 export default {
-    data() {
-        return {
-            mandalList: [],
-            villageList: [],
-            constituencyData: {},
-            mandalName:'',
-            mandalAlliasName:'',
-            villageName:'',
-            config,
-        }
+  data() {
+    return {
+      mandalList: [],
+      villageList: [],
+      mandalName: "",
+      mandalAlliasName: "",
+      villageName: "",
+      villageAlliasName: "",
+      config
+    };
+  },
+  methods: {
+    ...mapActions(["updateMandalName", "updateVillageName"]),
+    getMandalList(constituency) {
+      db.collection("MandalList")
+        .where("cName", "==", constituency)
+        .get()
+        .then(result => {
+          this.mandalList = util.firebaseGetValidator(result).mName.sort();
+          this.mandalName = this.getMandalName;
+          this.mandalAlliasName = this.getMandalAliasName;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
-    methods:{
-        ...mapActions(['updateMandalName', 'updateVillageName']),
-        getConstituencyData(constituency) {
-            const url = config.urls.getMandalAndVillageList.replace('{constituency}', constituency);
-            axios.get(url).then((result) => {
-                this.constituencyData = _values(result.data)[0];
-                this.getMandalList();
-            }).catch((err) => {
-                console.log(err);
-            })
-        },
-        getMandalList() {
-            this.mandalList = _keys(this.constituencyData);
-            this.mandalList.push(config.aliasNames.mandalAliasName);
-            this.mandalName = this.getMandalName;
-            this.mandalAlliasName = this.getMandalAliasName;
-        },
-        setManDalAndVillageName() {
-            this.$store.dispatch('updateMandalName', this.mandalName);
-            this.$store.dispatch('updateMandalAliasName', this.mandalAlliasName);
-            this.$store.dispatch('updateVillageName', this.villageName);
-            router.push('/survey');
-        }
-    },
-    computed: {
-        ...mapGetters(['getAuthData', 'getMandalName', 'getVillageName','getMandalAliasName']),
-    },
-    created() {
-        const authData = this.getAuthData;
-        if(authData && !authData.admin) {
-            this.getConstituencyData(authData.constituency);
-        }
-    },
-    watch: {
-        mandalName(newValue, oldValue) {
-          this.villageList = this.constituencyData[newValue];
+    getVillageList(mandalName) {
+      db.collection("VillageList")
+        .where("mName", "==", mandalName)
+        .get()
+        .then(result => {
+          this.villageList = util.firebaseGetValidator(result).vName.sort();
           this.villageName = this.getVillageName;
-          this.$store.dispatch('updateMandalAliasName', '');
-        }
+          this.$store.dispatch("updateMandalAliasName", "");
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
-}
+    setManDalAndVillageName() {
+      this.$store.dispatch("updateMandalName", this.mandalName);
+      this.$store.dispatch("updateMandalAliasName", this.mandalAlliasName);
+      this.$store.dispatch("updateVillageName", (this.mandalName === this.aliasName) ? this.aliasName :this.villageName);
+      this.$store.dispatch("updateVillageAliasName", this.villageAlliasName);
+      router.push("/survey");
+    }
+  },
+  computed: {
+    ...mapGetters([
+      "getAuthData",
+      "getMandalName",
+      "getVillageName",
+      "getMandalAliasName",
+      "getVillageAliasName"
+    ]),
+    aliasName() {
+      return config.mandalVillageAliasName;
+    }
+  },
+  created() {
+    const authData = this.getAuthData;
+    if (authData && !authData.admin) {
+      this.getMandalList(authData.constituency);
+    }
+  },
+  watch: {
+    mandalName(newValue, oldValue) {
+      this.getVillageList(newValue);
+    }
+  }
+};
 </script>
 
 <style>

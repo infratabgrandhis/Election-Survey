@@ -15,6 +15,7 @@ export default new Vuex.Store({
     mandalName: "",
     mandalAliasName: "",
     villageName: "",
+    villageAliasName: "",
     snackObj: {}
   },
   getters: {
@@ -32,6 +33,9 @@ export default new Vuex.Store({
     },
     getVillageName: state => {
       return state.villageName;
+    },
+    getVillageAliasName: state => {
+      return state.villageAliasName;
     },
     getSnackData: state => {
       return state.snackObj;
@@ -60,7 +64,10 @@ export default new Vuex.Store({
     },
     setVillageName(state, payload) {
       Vue.set(state, "villageName", payload);
-    }
+    },
+    setVillageAliasName(state, payload) {
+      Vue.set(state, "villageAliasName", payload);
+    },
   },
   actions: {
     toggleBurgerbar(context, payload) {
@@ -94,6 +101,9 @@ export default new Vuex.Store({
     },
     updateVillageName(context, payload) {
       context.commit("setVillageName", payload);
-    }
+    },
+    updateVillageAliasName(context, payload) {
+      context.commit("setVillageAliasName", payload);
+    },
   }
 });

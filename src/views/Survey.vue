@@ -102,12 +102,12 @@
 </template>
 
 <script>
-import config from "../config/firebase.json";
+import config from "@/config/firebase.json";
 import axios from "axios";
 import { db } from "@/fire.js";
 import util from "@/util/util.js";
 import _values from "lodash/values";
-import router from "../router.js";
+import router from "@/router.js";
 
 export default {
   data() {
@@ -253,8 +253,11 @@ export default {
         date: new Date().toGMTString(),
         feedback: this.currentQuestionAns
       };
-      if (payload.mandal === config.aliasNames.mandalAliasName) {
+      if (payload.mandal === config.mandalVillageAliasName) {
         payload.mandalAlias = state.mandalAliasName;
+      }
+      if (payload.village === config.mandalVillageAliasName) {
+        payload.villageAlias = state.villageAliasName;
       }
       if (payload.feedback) {
         axios
@@ -280,15 +283,21 @@ export default {
     const state = this.$store.state;
     if (state.authUser.email) {
       if (state.mandalName && state.villageName) {
-        if (state.mandalName === config.aliasNames.mandalAliasName) {
-          if (state.mandalAliasName) {
+        if (
+          state.mandalName === config.mandalVillageAliasName ||
+          state.villageName === config.mandalVillageAliasName
+        ) {
+          if (
+            (state.mandalAliasName && state.villageAliasName) ||
+            state.villageAliasName
+          ) {
             this.getOccupationList();
             this.getQuestionMetaData();
             this.getAgeList();
           } else {
             this.errorCallback({
               message:
-                "You should enter mandal name manually, when mandal name is OTHER."
+                "You should enter mandal name manually, when mandal or village name is OTHER."
             });
             router.push("/");
           }

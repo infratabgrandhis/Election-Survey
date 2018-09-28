@@ -73,7 +73,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import router from '../router.js'
+import router from '@/router.js'
 
 export default {
     computed: {

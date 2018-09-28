@@ -19,7 +19,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import LoginHome from './LoginHome'
+import LoginHome from '@/views/LoginHome'
 
 export default {
   computed: {

@@ -11,7 +11,5 @@
     "submitSurvey": "https://survey-e4c99.firebaseio.com/{uid}.json",
     "getMandalAndVillageList": "https://survey-e4c99.firebaseio.com/{constituency}.json"
   },
-  "aliasNames": {
-    "mandalAliasName": "OTHER"
-  }
+  "mandalVillageAliasName": "Other"
 }

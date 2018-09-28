@@ -74,7 +74,7 @@ export default {
       db.collection("ConstituencyList")
         .get()
         .then(result => {
-          this.constituenciesList = util.firebaseGetValidator(result).data;
+          this.constituenciesList = util.firebaseGetValidator(result).data.sort();
         })
         .catch(err => {
           console.log(err);
