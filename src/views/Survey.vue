@@ -82,9 +82,6 @@
                                 auto-grow
                                 class="full-width"
                                 hint="Enter Complaints and issues"></v-textarea>
-                    <v-btn color="success"
-                           @click="submitSurvey"
-                           v-if="currentQuestion.isQuestionsOver">Submit</v-btn>
                     <v-btn color="#1867c0"
                            v-if="currentQuestionIndex !== 0 "
                            @click="getPreviousQuestion"
@@ -95,6 +92,9 @@
                            @click="getNextQuestion"
                            dark>Next
                     </v-btn>
+                    <v-btn color="success"
+                           @click="submitSurvey"
+                           v-if="currentQuestion.isQuestionsOver">Submit</v-btn>
                 </v-layout>
             </v-container>
         </v-form>
@@ -238,7 +238,6 @@ export default {
     },
     submitSurvey() {
       const state = this.$store.state;
-      const url = config.urls.submitSurvey.replace("{uid}", state.authUser.uid);
       const payload = {
         name: this.name,
         phone: this.phone,
@@ -251,7 +250,8 @@ export default {
         mandal: state.mandalName,
         village: state.villageName,
         date: new Date().toGMTString(),
-        feedback: this.currentQuestionAns
+        feedback: this.currentQuestionAns,
+        uid: state.authUser.uid
       };
       if (payload.mandal === config.mandalVillageAliasName) {
         payload.mandalAlias = state.mandalAliasName;
@@ -259,9 +259,10 @@ export default {
       if (payload.village === config.mandalVillageAliasName) {
         payload.villageAlias = state.villageAliasName;
       }
+      util.manipulateFeedbackQuestions(payload);
       if (payload.feedback) {
-        axios
-          .post(url, payload)
+        db.collection("Feedback")
+          .add(payload)
           .then(result => {
             this.errorCallback({
               message: "Successfully submitted survey",

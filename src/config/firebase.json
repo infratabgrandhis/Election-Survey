@@ -7,9 +7,5 @@
     "storageBucket": "survey-e4c99.appspot.com",
     "messagingSenderId": "1009853134874"
   },
-  "urls": {
-    "submitSurvey": "https://survey-e4c99.firebaseio.com/{uid}.json",
-    "getMandalAndVillageList": "https://survey-e4c99.firebaseio.com/{constituency}.json"
-  },
   "mandalVillageAliasName": "Other"
 }

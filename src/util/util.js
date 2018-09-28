@@ -6,4 +6,10 @@ function firebaseGetValidator(result, index) {
   }
 }
 
-export default { firebaseGetValidator };
+function manipulateFeedbackQuestions(payload) {
+  payload.questionAndAnswers.forEach(question => {
+    payload[question.questionId] = question.answer;
+  }); 
+}
+
+export default { firebaseGetValidator, manipulateFeedbackQuestions };
