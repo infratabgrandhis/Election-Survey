@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import Vuetify from './plugins/vuetify';
 import HighCharts from './plugins/highCharts';
+import {db} from './fire.js';
 import store from './store';
 import router from './router';
 import App from './App.vue';
-import firebaseConfig from './config/firebase.json';
 import './registerServiceWorker';
 
 Vue.config.productionTip = false;
@@ -15,5 +15,3 @@ new Vue({
   Vuetify,
   render: h => h(App),
 }).$mount('#app');
-
-firebase.initializeApp(firebaseConfig.initializeConfig);

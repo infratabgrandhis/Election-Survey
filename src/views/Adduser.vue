@@ -38,83 +38,95 @@
 </template>
 
 <script>
-import config from '../config/firebase.json'
-import axios from 'axios'
-import _values from 'lodash/values'
-import router from '../router.js'
+import _values from "lodash/values";
+import router from "@/router.js";
+import { db } from "@/fire.js";
+import util from "@/util/util.js";
 
 export default {
-    data() {
-        return {
-            admin: false,
-            name:'',
-            phone:'',
-            email:'',
-            password:'',
-            constituenciesList:[],
-            constituency:'',
-            rules: {
-                required: true,
-                min: value => {
-                    if(value) {
-                        return value.length >= 8 || 'Min 8 characters';
-                    } else {
-                        return '';
-                    }
-                },
-                email: value => {
-                    const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                    return pattern.test(value) || 'Invalid e-mail.'
-                }
-            }
-        }
-    },
-    methods: {
-        getConstituenciesList() {
-            axios.get(config.urls.getConstituenciesList).then((result) => {
-                this.constituenciesList = _values(result.data)[0].data || [];
-            }).catch((err) => {
-                console.log(err);
-            })
+  data() {
+    return {
+      admin: false,
+      name: "",
+      phone: "",
+      email: "",
+      password: "",
+      constituenciesList: [],
+      constituency: "",
+      rules: {
+        required: true,
+        min: value => {
+          if (value) {
+            return value.length >= 8 || "Min 8 characters";
+          } else {
+            return "";
+          }
         },
-        addUser() {
-            firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then((result) => {
-               axios.post(config.urls.users, {
-                    name:this.name,
-                    phone:this.phone,
-                    email:this.email,
-                    uid: result.uid,
-                    constituency:(!this.admin) ? this.constituency : '',
-                    admin: this.admin
-                }).then(res => {
-                    this.$store.dispatch('updateAuthData');
-                    this.$store.dispatch('manipulateSnackData', {
-                        txt: 'Successfully added new user and loggedin with new user credentials',
-                        color:'success',
-                        active: true
-                    });
-                }).catch(err => {
-                    this.$store.dispatch('manipulateSnackData', {
-                        txt: err.message,
-                        color:'error',
-                        active: true
-                    });    
-                })
-            }).catch((err) => {
-                this.$store.dispatch('manipulateSnackData', {
-                        txt: err.message,
-                        color:'error',
-                        active: true
-                    });
-            });
+        email: value => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          return pattern.test(value) || "Invalid e-mail.";
         }
+      }
+    };
+  },
+  methods: {
+    getConstituenciesList() {
+      db.collection("ConstituencyList")
+        .get()
+        .then(result => {
+          this.constituenciesList = util.firebaseGetValidator(result).data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
-    created() {
-        if(this.$store.state.authUser.email) {
-            this.getConstituenciesList();
-        } else {
-            router.push('/signin');
-        }
+    addUser() {
+      const data = {
+        name: this.name,
+        phone: this.phone,
+        email: this.email,
+        constituency: !this.admin ? this.constituency : "",
+        admin: this.admin
+      };
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(this.email, this.password)
+        .then(result => {
+          data.uid = result.user.uid;
+          db.collection("Employees")
+            .add(data)
+            .then(res => {
+              this.$store.dispatch("updateAuthData");
+              this.$store.dispatch("manipulateSnackData", {
+                txt:
+                  "Successfully added new user and loggedin with new user credentials",
+                color: "success",
+                active: true
+              });
+            })
+            .catch(err => {
+              this.$store.dispatch("manipulateSnackData", {
+                txt: err.message,
+                color: "error",
+                active: true
+              });
+            });
+        })
+        .catch(err => {
+          this.$store.dispatch("manipulateSnackData", {
+            txt: err.message,
+            color: "error",
+            active: true
+          });
+        });
     }
-}
+  },
+  created() {
+    if (this.$store.state.authUser.email) {
+      this.getConstituenciesList();
+    } else {
+      router.push("/signin");
+    }
+  }
+};
 </script>

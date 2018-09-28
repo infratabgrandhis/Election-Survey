@@ -18,6 +18,5 @@ export default {
         ...mapActions(['toggleBurgerbar'])
     },
 }
-console.log(this);
 </script>
 

@@ -24,33 +24,36 @@
 </template>
 
 <script>
-import config from '../config/firebase.json'
-import axios from 'axios'
-import _values from 'lodash/values'
-import DummyChart from './DummyChart.vue'
+import { db } from "@/fire.js";
+import util from "@/util/util.js";
+import _values from "lodash/values";
+import DummyChart from "./DummyChart.vue";
 
 export default {
-    data() {
-        return {
-            constituenciesList:[],
-            constituency:'',
-        }
-    },
-    components:{
-        DummyChart,
-    },
-    methods:{
-        getConstituenciesList() {
-            axios.get(config.urls.getConstituenciesList).then((result) => {
-                this.constituenciesList = _values(result.data)[0].data || [];
-            }).catch((err) => {
-                console.log(err);
-            })
-        },
-    },
-    created() {
-        this.getConstituenciesList();
+  data() {
+    return {
+      constituenciesList: [],
+      constituency: ""
+    };
+  },
+  components: {
+    DummyChart
+  },
+  methods: {
+    getConstituenciesList() {
+      db.collection("ConstituencyList")
+        .get()
+        .then(result => {
+          this.constituenciesList = util.firebaseGetValidator(result).data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
-}
+  },
+  created() {
+    this.getConstituenciesList();
+  }
+};
 </script>
 

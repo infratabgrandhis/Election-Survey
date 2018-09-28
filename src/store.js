@@ -1,20 +1,20 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import router from './router'
-import _get from 'lodash/get'
-import axios from 'axios'
-import config from './config/firebase.json'
-import _ from 'lodash'
+import Vue from "vue";
+import Vuex from "vuex";
+import router from "@/router";
+import _get from "lodash/get";
+import _ from "lodash";
+import { db } from "@/fire.js";
+import util from '@/util/util.js';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     isBurgerbarOpen: false,
     authUser: {},
-    mandalName: '',
-    mandalAliasName:'',
-    villageName: '',
+    mandalName: "",
+    mandalAliasName: "",
+    villageName: "",
     snackObj: {}
   },
   getters: {
@@ -35,63 +35,65 @@ export default new Vuex.Store({
     },
     getSnackData: state => {
       return state.snackObj;
-    },
+    }
   },
   mutations: {
     manipulateBurgerbar(state, payload) {
-      Vue.set(state, 'isBurgerbarOpen', payload);
+      Vue.set(state, "isBurgerbarOpen", payload);
     },
     setSnackbarData(state, payload) {
-      Vue.set(state, 'snackObj', payload);
+      Vue.set(state, "snackObj", payload);
     },
     setAuthData(state, payload) {
-      Vue.set(state, 'authUser', payload);
-      if (_get(payload, 'uid')) {
-        router.push('/');
+      Vue.set(state, "authUser", payload);
+      if (_get(payload, "uid")) {
+        router.push("/");
       } else {
-        router.push('/signin');
+        router.push("/signin");
       }
     },
     setMandalName(state, payload) {
-      Vue.set(state, 'mandalName', payload);
+      Vue.set(state, "mandalName", payload);
     },
     setMandalAliasName(state, payload) {
-      Vue.set(state, 'mandalAliasName', payload);
+      Vue.set(state, "mandalAliasName", payload);
     },
     setVillageName(state, payload) {
-      Vue.set(state, 'villageName', payload);
+      Vue.set(state, "villageName", payload);
     }
   },
   actions: {
     toggleBurgerbar(context, payload) {
-      context.commit('manipulateBurgerbar', !context.state.isBurgerbarOpen);
+      context.commit("manipulateBurgerbar", !context.state.isBurgerbarOpen);
     },
     manipulateSnackData(context, payload) {
-      context.commit('setSnackbarData', payload);
+      context.commit("setSnackbarData", payload);
     },
     updateAuthData(context, payload) {
       firebase.auth().onAuthStateChanged(user => {
-        if (_get(user, 'uid')) {
-          axios.get(config.urls.users).then(result => {
-            const usersList = _.values(result.data);
-            const userData = _.find(usersList, {
-              uid: user.uid
+        if (_get(user, "uid")) {
+          db.collection("Employees")
+            .where("uid", "==", user.uid)
+            .get()
+            .then(result => {
+              context.commit("setAuthData", util.firebaseGetValidator(result));
+            })
+            .catch(err => {
+              context.commit("setAuthData", {});
             });
-            context.commit('setAuthData', userData);
-          });
         } else {
-          context.commit('setAuthData', {});
+          context.commit("setAuthData", {});
         }
       });
     },
     updateMandalName(context, payload) {
-      context.commit('setMandalName', payload);
+      context.commit("setMandalName", payload);
     },
     updateMandalAliasName(context, payload) {
-      context.commit('setMandalAliasName', payload);
+      context.commit("setMandalAliasName", payload);
     },
     updateVillageName(context, payload) {
-      context.commit('setVillageName', payload);
-    },
+      context.commit("setVillageName", payload);
+    }
   }
-})
+});
