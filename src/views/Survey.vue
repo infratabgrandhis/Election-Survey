@@ -102,174 +102,212 @@
 </template>
 
 <script>
-import config from '../config/firebase.json'
-import axios from 'axios'
-import _values from 'lodash/values'
-import router from '../router.js'
+import config from "../config/firebase.json";
+import axios from "axios";
+import { db } from "@/fire.js";
+import util from "@/util/util.js";
+import _values from "lodash/values";
+import router from "../router.js";
 
 export default {
-    data() {
-        return {
-            name: '',
-            phone:'',
-            gender: ['Male', "Female"],
-            genderVal:'',
-            voterCategoryList: ['New_voter', "Existing_voter"],
-            voterCategoryVal:'',
-            ageList:[],
-            age:'',
-            occupationList:[],
-            occupationVal:'',
-            questionMeta:{},
-            currentQuestion:{},
-            isQuestionCardActive:false,
-            currentQuestionAns:'',
-            currentQuestionId:'',
-            currentQuestionIndex:0,
-            questionsWithAnswers:[]
-        }
+  data() {
+    return {
+      name: "",
+      phone: "",
+      gender: ["Male", "Female"],
+      genderVal: "",
+      voterCategoryList: ["New_voter", "Existing_voter"],
+      voterCategoryVal: "",
+      ageList: [],
+      age: "",
+      occupationList: [],
+      occupationVal: "",
+      questionMeta: {},
+      currentQuestion: {},
+      isQuestionCardActive: false,
+      currentQuestionAns: "",
+      currentQuestionId: "",
+      currentQuestionIndex: 0,
+      questionsWithAnswers: []
+    };
+  },
+  methods: {
+    getOccupationList() {
+      db.collection("OccupationList")
+        .get()
+        .then(result => {
+          this.occupationList = util.firebaseGetValidator(result).data;
+        })
+        .catch(err => {
+          this.errorCallback(err);
+        });
     },
-    methods: {
-        getOccupationList() {
-            axios.get(config.urls.occupationList).then((result) => {
-                this.occupationList = _values(result.data)[0].data || [];
-            }).catch((err) => {
-                this.errorCallback(err);
-            })
-        },
-        getAgeList() {
-            axios.get(config.urls.ageList).then((result) => {
-                this.ageList = _values(result.data)[0].data || [];
-            }).catch((err) => {
-                this.errorCallback(err);
-            })
-        },
-        errorCallback(err, color) {
-            this.$store.dispatch('manipulateSnackData', {
-                            txt: err.message,
-                            color: err.color || 'error',
-                            active: true
-                        });
-        },
-        getQuestionMetaData() {
-            if(config.urls.questionMeta) {
-                axios.get(config.urls.questionMeta).then((result) => {
-                    this.questionMeta = _values(result.data)[0] || {};
-                }).catch((err) => {
-                    this.errorCallback(err);
-                })
-            }
-        },
-        setCurrentQuestionAnswer(newValue) {
-            let defaultData = (this.currentQuestion.multipleSelection) ? [] : '';
-            let previousque = this.questionsWithAnswers[this.currentQuestionIndex];
-            this.currentQuestionAns = (previousque)?previousque.answer : defaultData;
-        },
-        getQuestionData(event, id){
-            const questionId = id || this.questionMeta.default;
-            const url = config.urls.questionURL.replace('{question}', questionId);
-            this.currentQuestionId = questionId;
-            if(this.name && this.genderVal && this.age && this.voterCategoryVal && this.occupationVal) {
-                if((this.phone && this.phone.length === 10) || !this.phone ) {
-                    axios.get(url).then((result) => {
-                        this.currentQuestion = _values(result.data)[0] || {};
-                        this.isQuestionCardActive = true;
-                        this.setCurrentQuestionAnswer();
-                    }).catch((err) => {
-                        this.errorCallback(err);
-                    })
-                } else {
-                    this.errorCallback({"message":"phone number not in valid format"})
-                }
-                
-            } else {
-                this.errorCallback({"message":'All the above fields are mandatory to fill..'});
-            }
-        },
-        getPreviousQuestion() {
-            this.currentQuestionIndex = this.currentQuestionIndex-1;
-            let previousque = this.questionsWithAnswers[this.currentQuestionIndex];
-            this.getQuestionData({}, previousque.questionId);
-        },
-        getNextQuestion() {
-            if(this.currentQuestionAns.length > 0){
-                let nextQuestionId = '';
-                if(this.currentQuestion.willDynamicQuestionCome) {
-                    const index = this.currentQuestion.options.indexOf(this.currentQuestionAns);
-                    nextQuestionId = this.questionMeta[this.currentQuestionId+'_'+index];
-                } else {
-                    nextQuestionId = this.questionMeta[this.currentQuestionId];
-                }
-                this.questionsWithAnswers[this.currentQuestionIndex] = {
-                    question:this.currentQuestion.question,
-                    answer: this.currentQuestionAns,
-                    questionId: this.currentQuestionId
-                };
-                this.currentQuestionIndex = this.currentQuestionIndex+1;
-                this.getQuestionData({}, nextQuestionId);
-            } else {
-                this.errorCallback({"message":'Choose any value before go to next question.'})
-            }
-        },
-        submitSurvey() {
-            const state = this.$store.state;
-            const url = config.urls.submitSurvey.replace('{uid}', state.authUser.uid);
-            const payload = {
-                name: this.name,
-                phone:this.phone,
-                gender:this.genderVal,
-                age: this.age,
-                occupation: this.occupationVal,
-                voterCategory: this.voterCategoryVal,
-                questionAndAnswers: this.questionsWithAnswers,
-                constituency: state.authUser.constituency,
-                mandal: state.mandalName,
-                village:state.villageName,
-                date:new Date().toGMTString(),
-                feedback:this.currentQuestionAns
-            };
-            if(payload.mandal === config.aliasNames.mandalAliasName) {
-                payload.mandalAlias = state.mandalAliasName;
-            }
-            if (payload.feedback) {
-                axios.post(url, payload).then((result) => {
-                    this.errorCallback({"message":'Successfully submitted survey', color: 'success'});
-                    router.push('/');
-                }).catch((err) => {
-                    this.errorCallback(err);
-                })
-            } else {
-                this.errorCallback({"message":"Enter feedback and complaints in above field."});
-            }
-        }
+    getAgeList() {
+      db.collection("AgeList")
+        .get()
+        .then(result => {
+          this.ageList = util.firebaseGetValidator(result).data;
+        })
+        .catch(err => {
+          this.errorCallback(err);
+        });
     },
-    created() {
-        const state = this.$store.state;
-        if(state.authUser.email) {
-            if(state.mandalName && state.villageName) {
-                if(state.mandalName === config.aliasNames.mandalAliasName) {
-                    if(state.mandalAliasName) {
-                        this.getOccupationList();
-                        this.getQuestionMetaData();
-                        this.getAgeList();
-                    } else {
-                        this.errorCallback({"message":"You should enter mandal name manually, when mandal name is OTHER."});
-                        router.push('/');
-                    }
-                } else {
-                    this.getOccupationList();
-                    this.getQuestionMetaData();
-                    this.getAgeList();
-                }
-            } else {
-                this.errorCallback({"message":"First select Mandal and village before survey"});
-                router.push('/'); 
-            }
+    errorCallback(err, color) {
+      this.$store.dispatch("manipulateSnackData", {
+        txt: err.message,
+        color: err.color || "error",
+        active: true
+      });
+    },
+    getQuestionMetaData() {
+      db.collection("QuestionnaireMeta")
+        .get()
+        .then(result => {
+          this.questionMeta = util.firebaseGetValidator(result);
+        })
+        .catch(err => {
+          this.errorCallback(err);
+        });
+    },
+    setCurrentQuestionAnswer(newValue) {
+      let defaultData = this.currentQuestion.multipleSelection ? [] : "";
+      let previousque = this.questionsWithAnswers[this.currentQuestionIndex];
+      this.currentQuestionAns = previousque ? previousque.answer : defaultData;
+    },
+    getQuestionData(event, id) {
+      const questionId = id || this.questionMeta.default;
+      this.currentQuestionId = questionId;
+      if (
+        this.name &&
+        this.genderVal &&
+        this.age &&
+        this.voterCategoryVal &&
+        this.occupationVal
+      ) {
+        if ((this.phone && this.phone.length === 10) || !this.phone) {
+          db.collection("QuestionnaireList")
+            .where("id", "==", questionId)
+            .get()
+            .then(result => {
+              this.currentQuestion = util.firebaseGetValidator(result);
+              this.isQuestionCardActive = true;
+              this.setCurrentQuestionAnswer();
+            })
+            .catch(err => {
+              this.errorCallback(err);
+            });
         } else {
-            router.push('/signin');
+          this.errorCallback({ message: "phone number not in valid format" });
         }
+      } else {
+        this.errorCallback({
+          message: "All the above fields are mandatory to fill.."
+        });
+      }
     },
-}
+    getPreviousQuestion() {
+      this.currentQuestionIndex = this.currentQuestionIndex - 1;
+      let previousque = this.questionsWithAnswers[this.currentQuestionIndex];
+      this.getQuestionData({}, previousque.questionId);
+    },
+    getNextQuestion() {
+      if (this.currentQuestionAns.length > 0) {
+        let nextQuestionId = "";
+        if (this.currentQuestion.willDynamicQuestionCome) {
+          const index = this.currentQuestion.options.indexOf(
+            this.currentQuestionAns
+          );
+          nextQuestionId = this.questionMeta[
+            this.currentQuestionId + "_" + index
+          ];
+        } else {
+          nextQuestionId = this.questionMeta[this.currentQuestionId];
+        }
+        this.questionsWithAnswers[this.currentQuestionIndex] = {
+          question: this.currentQuestion.question,
+          answer: this.currentQuestionAns,
+          questionId: this.currentQuestionId
+        };
+        this.currentQuestionIndex = this.currentQuestionIndex + 1;
+        this.getQuestionData({}, nextQuestionId);
+      } else {
+        this.errorCallback({
+          message: "Choose any value before go to next question."
+        });
+      }
+    },
+    submitSurvey() {
+      const state = this.$store.state;
+      const url = config.urls.submitSurvey.replace("{uid}", state.authUser.uid);
+      const payload = {
+        name: this.name,
+        phone: this.phone,
+        gender: this.genderVal,
+        age: this.age,
+        occupation: this.occupationVal,
+        voterCategory: this.voterCategoryVal,
+        questionAndAnswers: this.questionsWithAnswers,
+        constituency: state.authUser.constituency,
+        mandal: state.mandalName,
+        village: state.villageName,
+        date: new Date().toGMTString(),
+        feedback: this.currentQuestionAns
+      };
+      if (payload.mandal === config.aliasNames.mandalAliasName) {
+        payload.mandalAlias = state.mandalAliasName;
+      }
+      if (payload.feedback) {
+        axios
+          .post(url, payload)
+          .then(result => {
+            this.errorCallback({
+              message: "Successfully submitted survey",
+              color: "success"
+            });
+            router.push("/");
+          })
+          .catch(err => {
+            this.errorCallback(err);
+          });
+      } else {
+        this.errorCallback({
+          message: "Enter feedback and complaints in above field."
+        });
+      }
+    }
+  },
+  created() {
+    const state = this.$store.state;
+    if (state.authUser.email) {
+      if (state.mandalName && state.villageName) {
+        if (state.mandalName === config.aliasNames.mandalAliasName) {
+          if (state.mandalAliasName) {
+            this.getOccupationList();
+            this.getQuestionMetaData();
+            this.getAgeList();
+          } else {
+            this.errorCallback({
+              message:
+                "You should enter mandal name manually, when mandal name is OTHER."
+            });
+            router.push("/");
+          }
+        } else {
+          this.getOccupationList();
+          this.getQuestionMetaData();
+          this.getAgeList();
+        }
+      } else {
+        this.errorCallback({
+          message: "First select Mandal and village before survey"
+        });
+        router.push("/");
+      }
+    } else {
+      router.push("/signin");
+    }
+  }
+};
 </script>
 
 <style>
