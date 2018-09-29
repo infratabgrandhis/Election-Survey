@@ -32,7 +32,7 @@ import { db } from "@/fire.js";
 import util from "@/util/util.js";
 import _groupBy from "lodash/groupBy";
 import _map from "lodash/map";
-import Chart from "./DummyChart.vue";
+import Chart from "./Chart.vue";
 
 export default {
   data() {
