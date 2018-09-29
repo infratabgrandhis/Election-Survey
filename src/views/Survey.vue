@@ -103,7 +103,6 @@
 
 <script>
 import config from "@/config/firebase.json";
-import axios from "axios";
 import { db } from "@/fire.js";
 import util from "@/util/util.js";
 import _values from "lodash/values";
