@@ -58,10 +58,22 @@ export default {
         return item[this.queId];
       });
       data = _map(data, (value, key) => {
-        return {
+        let obj = {
           name: key,
           y: value.length
         };
+        switch(key) {
+          case 'TRS':
+            obj.color = '#E60386';
+            break;
+          case 'Congress/TDP/CPI(M)': 
+            obj.color = 'green';
+            break;
+          case 'BJP': 
+            obj.color = '#F07B21';
+            break;
+        }
+        return obj;
       });
       return data;
     },

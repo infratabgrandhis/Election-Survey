@@ -6,6 +6,7 @@ import Signout from './views/Signout.vue'
 import Adduser from './views/Adduser.vue'
 import Survey from './views/Survey.vue'
 import Analytics from './views/Analytics.vue'
+import Download from './views/Download.vue'
 
 Vue.use(Router)
 
@@ -34,5 +35,9 @@ export default new Router({
     path: '/analytics',
     name: 'Analytics',
     component: Analytics
+  }, {
+    path: '/download',
+    name: 'Download',
+    component: Download
   }]
 })

@@ -14,7 +14,7 @@
                             align-center>
                         <v-expansion-panel v-if="constituency">
                           <v-expansion-panel-content>
-                            <div slot="header">Filter</div>
+                            <div slot="header">Filters</div>
                             <v-card class="pl-4 pr-4 pb-2">
                               <v-radio-group v-model="genderVal"
                                             row
@@ -67,6 +67,7 @@ import { db } from "@/fire.js";
 import util from "@/util/util.js";
 import _filter from "lodash/filter";
 import Chart from "./Chart.vue";
+import router from "@/router.js";
 
 export default {
   data() {
@@ -144,9 +145,17 @@ export default {
     }
   },
   created() {
-    this.getConstituenciesList();
-    this.getAgeList();
-    this.getOccupationList();
+    if (this.$store.state.authUser.email) {
+      if (this.$store.state.authUser.admin) {
+        this.getConstituenciesList();
+        this.getAgeList();
+        this.getOccupationList();
+      } else {
+        router.push("/");  
+      }
+    } else {
+      router.push("/signin");
+    }
   },
   watch: {
     constituency(newValue) {

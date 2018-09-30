@@ -41,6 +41,15 @@
                     <v-list-tile-title>Analytics</v-list-tile-title>
                 </v-list-tile-content>
             </v-list-tile>
+            <v-list-tile @click.native="toggleBurgerBarAndRouteChange('/download')"
+                         v-if="getAuthData && getAuthData.admin">
+                <v-list-tile-action>
+                    <v-icon>arrow_downward</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                    <v-list-tile-title>Download</v-list-tile-title>
+                </v-list-tile-content>
+            </v-list-tile>
             <v-list-tile @click.native="toggleBurgerBarAndRouteChange('/signin')"
                          v-if="getAuthData && !getAuthData.email">
                 <v-list-tile-action>
