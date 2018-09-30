@@ -6,13 +6,17 @@
 
 <script>
 import { Chart } from "highcharts-vue";
+import _groupBy from "lodash/groupBy";
+import _find from "lodash/find";
+import _map from "lodash/map";
+
 export default {
   props: {
     data: {
       type: Array,
       default: []
     },
-    title: ""
+    queId: ""
   },
   data() {
     return {
@@ -37,7 +41,7 @@ export default {
           }
         ]
       },
-      chartOptions: {}
+      chartOptions: {},
     };
   },
   mounted() {
@@ -48,10 +52,29 @@ export default {
   components: {
     highcharts: Chart
   },
+  methods: {
+    getChartData() {
+      let data = _groupBy(this.data, item => {
+        return item[this.queId];
+      });
+      data = _map(data, (value, key) => {
+        return {
+          name: key,
+          y: value.length
+        };
+      });
+      return data;
+    },
+  },
   watch: {
     data(newValue, oldValue) {
-      this.chartBasicOptions.title.text = this.title;
-      this.chartBasicOptions.series[0].data = this.data;
+      const list = this.getChartData();
+      if (list.length > 0) {
+        this.chartBasicOptions.title.text = _find(this.data[0]['questionAndAnswers'], {'questionId': this.queId}).question;
+      } else {
+        this.chartBasicOptions.title.text = 'There is no data to render.';
+      }
+      this.chartBasicOptions.series[0].data = list;
       this.chartOptions = this.chartBasicOptions;
     }
   }
