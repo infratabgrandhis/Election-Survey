@@ -33,7 +33,7 @@ export default {
               enabled: false
             },
             showInLegend: true
-          }
+          },
         },
         series: [
           {
@@ -71,6 +71,12 @@ export default {
             break;
           case 'BJP': 
             obj.color = '#F07B21';
+            break;
+          case 'NOTA': 
+            obj.color = '#3F51B5';
+            break;
+          case 'Independent': 
+            obj.color = '#5C5C61';
             break;
         }
         return obj;

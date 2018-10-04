@@ -3,13 +3,13 @@
         <v-subheader class="pa-1">Analytics</v-subheader>
         <v-form class="pa-2">
             <v-container>
-                <v-layout row
+                <v-layout column
                           wrap>
                     <v-select :items="constituenciesList"
                               v-model="constituency"
                               class="full-width"
                               label="constituencies"></v-select>
-                        <v-layout row
+                        <v-layout column
                             wrap
                             align-center>
                         <v-expansion-panel v-if="constituency">
@@ -46,8 +46,7 @@
                             </v-card>
                           </v-expansion-panel-content>
                         </v-expansion-panel>
-                        <v-divider></v-divider>
-                        <div v-if="constituency">
+                        <div v-if="constituency" class="pt-2">
                           <Chart :data="chartData" queId="Rvdglq55qaFYphTZQjia6Etv"></Chart>
                           <v-divider dark inset></v-divider>
                           <!-- <Chart :data="getChartData('Rvdglq55qaFYphTZQjia6Etv')" title="Parties status based on constituency"></Chart> -->
